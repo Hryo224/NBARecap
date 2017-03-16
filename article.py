@@ -5,30 +5,10 @@ import pprint
 import os
 from datetime import date, timedelta
 
-def parse_quarter_to_table(team):
-    content = "<th>" + team['team'] + "</th>"
-    total = 0
-    for quarter in team['quarters']:
-        total += int(quarter)
-        content += "<td>" + quarter + "</td>"
-    content += "<td>" + str(total) + "</td>"
-    return content
-
-def generate_summary_table(home, away):
-    nth = {1: "1st", 2: "2nd", 3: "3rd", 4: "4th", 5: "OT1", 6: "OT2", 7: "OT3"}
-    table = "<center><table><tr><th/>"
-    for i in range(0, len(home['quarters'])):
-        table += "<th>" + nth[i+1] + "</th>"
-    table += "<th>Total</th>"
-    table += "<tr>" + parse_quarter_to_table(home) + "</tr>"
-    table += "<tr>" + parse_quarter_to_table(away) + "</tr>"
-    table += "</table></center>"
-    return table
-
 def generate_report(boxscore, home, away, article):
-    content = "<html><head><link rel='stylesheet' type='text/css' href='/home/nogoodnamesqq/NBA/Recap/html/style.css'>"
+    content = "<html><head><link rel='stylesheet' type='text/css' href='/home/nogoodnamesqq/NBARecap/html/style.css'>"
     content += "<center><h1>" + home['team'] + " vs " + away['team'] + "</h1></center>"
-    content += generate_summary_table(home, away)
+    content += b.generate_summary_table(home, away)
     content += b.generate_boxscore(home, boxscore)
     content += b.generate_boxscore(away, boxscore)
     content += article
