@@ -1,17 +1,19 @@
 import boxscore as b
 import pdfkit as p
+import gamethread as g
 import nba
 import pprint
 import os
-from datetime import date, timedelta
+from datetime import datetime, date, timedelta
 
-def generate_report(boxscore, home, away, article):
-    content = "<html><head><link rel='stylesheet' type='text/css' href='/home/nogoodnamesqq/NBARecap/html/style.css'>"
+def generate_report(boxscore, home, away, article, date, city):
+    content = "<html><head><link rel='stylesheet' type='text/css' href='" + os.environ.get("CSS_LOC") + "'>"
     content += "<center><h1>" + home['team'] + " vs " + away['team'] + "</h1></center>"
     content += b.generate_summary_table(home, away)
     content += b.generate_boxscore(home, boxscore)
     content += b.generate_boxscore(away, boxscore)
     content += article
+    content += "<center><img src=/home/nogoodnamesqq/NBARecap/images/" + city.replace(" ", '') + date.replace(" ", '') + ".png width='750', height='350'></center>"
     content += "</html>"
     return content
 
@@ -43,7 +45,8 @@ def get_game_data(game, team):
     return game_data
 
 def init(date):
-    dir = "/home/nogoodnamesqq/NBA/Recap/html/"+date+"/"
+    formatted_date = datetime.strptime(date, '%Y%m%d').strftime('%B %d, %Y')
+    dir = "html/"+date+"/"
     if not os.path.exists(dir):
         os.makedirs(dir)
     for game in get_scoreboard(date).get('games'):
@@ -51,13 +54,21 @@ def init(date):
         home = get_game_data(game, 'hTeam')
         away = get_game_data(game, 'vTeam')
         article = get_article(game, date)
-        report = generate_report(boxscore, home, away, article)
+        city = find_team_city(home.get('team'))
+        thread = g.generate_wordcloud(formatted_date, city)
+        report = generate_report(boxscore, home, away, article, formatted_date, city)
         file_name = home['team'] + "vs" + away['team'] + date + ".pdf"
         p.from_string(report, file_name)
         os.rename(file_name, dir+file_name)
-
+        
 def get_yesterday_date():
     return (date.today() - timedelta(1)).strftime('%Y%m%d')
+
+def find_team_city(triCode):
+    teams = nba.nba_data("teams", 2016).get('league').get('standard')
+    for team in teams:
+        if team.get('tricode') == triCode:
+            return team.get('city')
 
 if __name__ == "__main__":
     calendar = nba.nba_data("calendar")
