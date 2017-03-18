@@ -8,7 +8,7 @@ from datetime import datetime, date, timedelta
 
 def generate_report(boxscore, home, away, article, date, city):
     content = "<html><head><link rel='stylesheet' type='text/css' href='" + os.environ.get("CSS_LOC") + "'>"
-    content += "<center><h1>" + home['team'] + " vs " + away['team'] + "</h1></center>"
+    content += "<center><h1>" + home.get('team') + " vs " + away.get('team') + "</h1></center>"
     content += b.generate_summary_table(home, away)
     content += b.generate_boxscore(home, boxscore)
     content += b.generate_boxscore(away, boxscore)
@@ -57,7 +57,7 @@ def init(date):
         city = find_team_city(home.get('team'))
         thread = g.generate_wordcloud(formatted_date, city)
         report = generate_report(boxscore, home, away, article, formatted_date, city)
-        file_name = home['team'] + "vs" + away['team'] + date + ".pdf"
+        file_name = home.get('team') + "vs" + away.get('team') + date + ".pdf"
         p.from_string(report, file_name)
         os.rename(file_name, dir+file_name)
         
