@@ -1,5 +1,5 @@
-import nba
-players = nba.nba_data("players", 2016).get("league").get("standard")
+from NBAData import nba_data
+players = nba_data("players", 2017).get("league").get("standard")
 
 class Player:
     def __init__(self, **kwargs):

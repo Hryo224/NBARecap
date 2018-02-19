@@ -1,4 +1,4 @@
-import nba
+from NBAData import nba_data
 from collections import OrderedDict
 from player import *
 import pprint
